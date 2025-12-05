@@ -1,0 +1,211 @@
+import pyray as rl
+import os, random, time, math
+
+# ----------------------------- #
+# --------- Variables --------- #
+# ----------------------------- #
+PokerTableBackground_File = r"PokerTableBackGround_v3.png"
+PokerTableBackground_Image = rl.load_image(str(PokerTableBackground_File))
+Background_width = PokerTableBackground_Image.width
+Background_height = PokerTableBackground_Image.height
+
+rl.init_window(Background_width, Background_height, "PokerTable yo")
+PokerTableBackground_Texture = rl.load_texture_from_image(PokerTableBackground_Image)
+
+CARD_WIDTH = 86
+CARD_HEIGHT = 129
+Dealt = False
+startTime=time.time()
+card_images = {}
+Ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"]
+Suits = ['hearts', 'diamonds', 'clubs', 'spades']
+
+
+PlayerMoneyTotal = 1000
+PlayerChips = 0 # Value o
+betting_mode = False
+bet_buffer = ""
+# --------------------------- #
+# --------- Classes --------- #
+# --------------------------- #
+class card:
+    def __init__(self, Rank, Suit,):
+        self.Rank = Rank
+        self.Suit = Suit
+
+    def __str__(self):
+        return f'{self.rank} of {self.suit}'
+class Deck:
+    def __init__(self, ranks_parameter, suits_parameter):
+        self.deck = []
+        for rank in ranks_parameter:
+            for suit in suits_parameter:
+                self.deck.append(card(rank, suit))
+
+    def length(self):
+        cardNum = 0
+        for i in self.deck:
+            cardNum += 1
+        return cardNum
+
+    def shuffle(self):
+        random.shuffle(self.deck)
+
+    def deal(self):
+        card_one = self.deck.pop()
+        return card_one
+    
+class Hand:
+    def __init__(self):
+        self.cards = []
+        self.value = 0
+
+    def __str__(self):
+        return f'{self.value} with a hand of {self.cards}'
+
+
+# ----------------------------- #
+# --------- Functions --------- #
+# ----------------------------- #
+
+def CardLoader(Rank, Suit):
+    Suit = Suit.lower()
+    if isinstance(Rank, str):
+        Rank = Rank.lower()
+        
+        
+        
+    if (Rank,Suit) in card_images:
+        return card_images[(Rank,Suit)]
+    
+    
+    
+    filename = rf"png-cards-1.3\{Rank}_of_{Suit}.png"
+    if os.path.exists(filename):
+        cardimg = rl.load_image(filename)
+        rl.image_resize(cardimg, CARD_WIDTH, CARD_HEIGHT)
+        texture = rl.load_texture_from_image(cardimg)
+        rl.unload_image(cardimg)
+        card_images[(Rank, Suit)] = texture
+        return texture
+    else:
+        print("No Card")
+        return
+
+
+def DrawCards(Hand, Start_x, Start_y, spacing = 35):
+    if len(Hand.cards) == 0:
+        return None
+    n = len(Hand.cards)
+
+    x = Start_x
+    total_width = n * CARD_WIDTH + (n - 1) * spacing
+    if Hand != RiverHand:
+        x = int(753 - total_width / 2)
+
+
+
+    for c in Hand.cards:
+        tex = CardLoader(c.Rank, c.Suit)
+        if tex:
+            rl.draw_texture(tex, x, Start_y, rl.WHITE)
+        x += CARD_WIDTH + spacing
+
+def HittingCard(Hand):
+    newcard = deck.deal()
+    Hand.cards.append(newcard)
+
+
+def Start(DealerHand, PlayerHand):
+    global Dealt
+    if Dealt:
+        return
+
+    for i in range(2):
+        HittingCard(DealerHand)
+        HittingCard(PlayerHand)
+
+        
+    Dealt = True
+    return Dealt
+
+# ----------------------------- #
+# --------- Draw GUI --------- #
+# ----------------------------- # 
+deck = Deck(Ranks,Suits)
+deck.shuffle(), deck.shuffle() # Proper double shuffle baby
+
+DealerHand = Hand()
+RiverHand = Hand()
+PlayerHand = Hand()
+BlankHand=Hand()
+# BlankHand.cards=[card('blank','clubs'),card('blank','clubs')]
+
+if rl.is_key_pressed(rl.KEY_B):
+    betting_mode = True
+    bet_buffer = "" # clears that shit 
+       
+    
+while not rl.window_should_close():
+    rl.begin_drawing()
+    rl.clear_background(rl.BLACK)
+    rl.draw_texture(PokerTableBackground_Texture , 0, 0, rl.WHITE)
+
+    if rl.is_key_pressed(rl.KEY_B):
+        betting_mode = True
+        bet_buffer = "" # clears that shit 
+    
+    if betting_mode:
+        key = rl.get_key_pressed()
+        while key > 0: 
+            if key == rl.KEY_ENTER:
+                if bet_buffer != "":
+                    PlayerChips = int(bet_buffer) # makes the player bet from the bet buffer 
+                    if PlayerChips > PlayerMoneyTotal:
+                        PlayerChips = PlayerMoneyTotal # all in function 
+                betting_mode = False
+                break
+            elif key == rl.KEY_BACKSPACE:
+                bet_buffer = bet_buffer[:-1] # had to google what would remove the last value of the str which is this dumb thing :-1 which means the last number we remove which is nice
+            elif rl.KEY_ZERO <= key <= rl.KEY_NINE:
+                # Every key has a keycode so if you just add the key to the bet buffer it adds the keycode to it not the number (learned the hard way) 
+                # To remove the keycode subtract the keycode of what you want from the keycode of zero so you have the difference
+                
+                digit = key - rl.KEY_ZERO   # 0–9
+                bet_buffer += str(digit)
+            print(bet_buffer)
+            key = rl.get_key_pressed()
+
+    if betting_mode:
+        rl.draw_text(f"Bet: {bet_buffer}_", 100, 60, 30, rl.BLUE)
+    else:
+        rl.draw_text(f"Bet: {PlayerChips}", 100, 60, 30, rl.BLUE)
+
+
+
+    if rl.is_key_pressed(rl.KEY_W):
+        Start(DealerHand, PlayerHand)
+        
+    if not Dealt:
+        rl.draw_text("Press W to Start", 620, 700, 30, rl.BLACK)
+
+    
+ 
+        
+    if Dealt:
+        deltaTime=time.time()-startTime
+
+        if deltaTime>3:
+            pass
+
+        if deltaTime>3:
+            DrawCards(RiverHand, 468, 426)
+        if deltaTime>2:
+            DrawCards(BlankHand, 710, 255, spacing = -60)
+
+        if deltaTime>1:
+            DrawCards(PlayerHand, 710, 615, spacing = -60 )
+    rl.end_drawing()
+        
+rl.unload_texture(PokerTableBackground_Texture)
+rl.close_window()
