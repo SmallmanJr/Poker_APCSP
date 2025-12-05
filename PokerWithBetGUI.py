@@ -21,7 +21,7 @@ Ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Jack", "Queen", "King", "Ace"]
 Suits = ['hearts', 'diamonds', 'clubs', 'spades']
 
 
-PlayerMoneyTotal = 1000
+PlayerMoneyTotal = 100
 PlayerChips = 0 # Value o
 betting_mode = False
 bet_buffer = ""
@@ -67,6 +67,37 @@ class Hand:
 # ----------------------------- #
 # --------- Functions --------- #
 # ----------------------------- #
+
+def winCheck(players):
+    rivcars=player[0].hand.cards()
+    for player in players:
+        if player==players[0]:
+            pass
+        else:
+            totalcards=rivcars+player.hand.cards()
+            dubs=0
+            trips=0
+            quads=0
+
+            #my_list = [0, 1, 2, 3, 4, 5, 2, 3, 5, 3]
+
+            repeats = {}
+
+            for num in totalcards:
+                num=num.rank()
+                if my_list.count(num) > 1:   # only numbers that repeat
+                    repeats[num] = my_list.count(num)
+
+            print(repeats)
+
+            #{2: 2, 3: 3, 5: 2}
+
+                
+
+
+    pass
+
+
 
 def CardLoader(Rank, Suit):
     Suit = Suit.lower()
