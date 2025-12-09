@@ -280,6 +280,7 @@ testing(RiverHand)
 print("Type is", type(RiverHand))
 firstThree = False
 current_turn_index = 1  # 0 = Dealer, 1 = Player
+betamountsaved = 1000
 while not rl.window_should_close():
     rl.begin_drawing()
     rl.clear_background(rl.BLACK)
@@ -288,7 +289,7 @@ while not rl.window_should_close():
     if Turn == "Player":
         if rl.is_key_pressed(rl.KEY_B):
             betting_mode = True
-            bet_buffer = "" # clears that shit 
+            #bet_buffer = "" # clears that shit 
             
         if rl.is_key_pressed(rl.KEY_C):
             if Turn == "Player":
@@ -305,7 +306,8 @@ while not rl.window_should_close():
         while key > 0: 
             if key == rl.KEY_ENTER:
                 if bet_buffer != "":
-                    PlayerChips.betamount = int(bet_buffer) # makes the player bet from the bet buffer 
+                    PlayerChips.betamount = int(bet_buffer)
+                    PlayerChips.total -= PlayerChips.Betamount # makes the player bet from the bet buffer 
                     if PlayerChips.betamount  > PlayerChips.total:
                         PlayerChips.betamount  = PlayerChips.total # all in function 
                 betting_mode = False
@@ -373,4 +375,5 @@ while not rl.window_should_close():
     rl.end_drawing()
         
 rl.unload_texture(PokerTableBackground_Texture)
+
 rl.close_window()
