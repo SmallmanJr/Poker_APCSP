@@ -31,6 +31,9 @@ bet_buffer = ""
 
 current_turn_index = 0  # 0 = Dealer, 1 = Player NOTE: Will replace later just am so tired rn
 Turn = "Player"
+
+PlayerChipConvert = {}
+PlayerNameConvert = {}
 # --------------------------- #
 # --------- Classes --------- #
 # --------------------------- #
@@ -60,7 +63,6 @@ class Deck:
     def deal(self):
         card_one = self.deck.pop()
         return card_one
-    
 class Hand:
     def __init__(self, Name):
         global players
@@ -75,23 +77,26 @@ class Hand:
                 activePlayers.append(self)
            
     def __str__(self):
-        return self.name
+        return f"{self.name}"
     
     def __repr__(self):
         return self.name
-    
+
 class Chips:
     def __init__(self, Name):
         self.total = 1000
         self.betamount = 0 
         self.name = Name
         List_of_PlayersChips.append(self)
+        PlayerChipConvert[Name] = self
+        PlayerNameConvert[Name] = self
+
         
     def __str__(self):
         return f'{self.name}'
         
     def __repr__(self):
-        return f'{self.name}'   
+        return self.name   
     
 Rank_map = {2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, 10:"T", "Jack":"J", "Queen":"Q", "King":"K", "Ace":"A"}
 Suit_map = {'hearts':"h", 'diamonds':"d", 'clubs':"c", 'spades':"s"}
@@ -211,7 +216,7 @@ def Fold(UserHand): # fold Function which removes the player from the active pla
     activePlayers.pop(IndexNumb)
     advance_turn()
 
-    
+        
 def AdvanceTurn():
     global Turn
     CurrentPlayers = []
@@ -253,23 +258,30 @@ def Check_or_call(Userhand):
             userChips.betamount = highestBet
             if userChips.betamount > userChips.total:
                 userChips.betamount = userChips.total 
-            print(userChips.betamount, userChips.name)
+            print(userChips.betamount, userChips.name, "New Bet")
             
-    else:
-        AdvanceTurn()
     
+    AdvanceTurn()
+
 
 
 def ManageMoney(Winner):   
-    for player in Players:
+    for player in players:
+        print(player, "Now testing")
+        try:
+            tempchip = PlayerChipConvert[player.name]
+            if player.name == Winner:
+                tempchip.total -= tempchip.betamount
+            if tempchip.total < 0:
+                tempchip.total = 0
+            else:
+                tempchip.total = tempchip.betamount*2
+            tempchips.betamount = 0 
+            
+            print(f"the new total {tempchips.total}, and the player bet is {tempchips.betamount}")
+        except:
+            print(f"{player.name} failed")
 
-        Playerchip = PlayerChipConvert[Player.name]
-        if Winner == player.name:
-            Winner.total -= Player.betamount
-            if PlayerChips.total > 0:
-                PlayerChips.total = 0
-        else:
-            PlayerChips.total = PlayerChips.betamount*2 
   
 def Start(DealerHand, PlayerHand): # Function to start the game. If it isnt already dealt, give both the dealer and the player cards.
     global Dealt, players
