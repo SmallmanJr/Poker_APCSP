@@ -104,20 +104,7 @@ Suit_map = {'hearts':"h", 'diamonds':"d", 'clubs':"c", 'spades':"s"}
 # ----------------------------- #
 # --------- Functions --------- #
 # ----------------------------- #
-'''
-def ConvertTextToFormat(CardHand):
-    TempList = []
-    for i, card in enumerate(CardHand.cards):
-        rank = card.Rank
-        suit = card.Suit
-        Rank_temp = Rank_map[rank]
-        Suit_temp = Suit_map[suit]
-        card = f"{Rank_temp}{Suit_temp}"
-        TempList.append(card)
-        Combined = ''.join(TempList)
-        CardHand.PokerKitStr = str(Combined)
-    return CardHand.PokerKitStr
-'''
+
 def CheckWin(Cheating = False):
     if Cheating:
         
@@ -214,7 +201,7 @@ def Fold(UserHand): # fold Function which removes the player from the active pla
     global players, activePlayers
     IndexNumb = activePlayers.index(UserHand)
     activePlayers.pop(IndexNumb)
-    advance_turn()
+    AdvanceTurn()
 
         
 def AdvanceTurn():
@@ -229,6 +216,7 @@ def AdvanceTurn():
     NextPlayer = activePlayers[NextTurn]
     print(NextPlayer, "NextUser")
     Turn = NextPlayer
+    return Turn
     
     
 def Check_or_call(Userhand):
@@ -313,7 +301,7 @@ BotChips.betamount = 100
 
 BlankHand=Hand(None)
 BlankHand.cards=[card('blank','clubs'),card('blank','clubs')]
-testing(RiverHand)
+
 print("Type is", type(RiverHand))
 firstThree = False
 current_turn_index = 1  # 0 = Dealer, 1 = Player
