@@ -1,3 +1,4 @@
+import random
 players = []
 activePlayers = []
 List_of_PlayersChips = []
@@ -110,23 +111,33 @@ def Check_or_call(Userhand):
             userChips.betamount = highestBet
             if userChips.betamount > userChips.total:
                 userChips.betamount = userChips.total 
-            print(userChips.betamount, userChips.name)
+            print(userChips.betamount, userChips.name, "New Bet")
             
-    else:
-        AdvanceTurn()
     
+    AdvanceTurn()
 
-def ManageMoney(Winner)   
-    for player in Players:
 
-        Playerchip = PlayerChipConvert[Player.name]
-        if Winner = player.name:
-            Winner.total -= Player.betamount
-            if PlayerChips.total > 0:
-                PlayerChips.total = 0
-        else:
-            PlayerChips.total = PlayerChips.betamount*2 
-        
+
+def ManageMoney(Winner):   
+    for player in players:
+        print(player, "Now testing")
+        try:
+            tempchip = PlayerChipConvert[player.name]
+            if player.name == Winner:
+                tempchip.total -= tempchip.betamount
+            if tempchip.total < 0:
+                tempchip.total = 0
+            else:
+                tempchip.total = tempchip.betamount*2
+            tempchips.betamount = 0 
+            
+            print(f"the new total {tempchips.total}, and the player bet is {tempchips.betamount}")
+        except:
+            print(f"{player.name} failed")
+
+
+
+
 RiverHand = Hand("River")
 DealerHand = Hand("Dealer")
 PlayerHand = Hand("Player")
@@ -141,3 +152,6 @@ bot3Chips = Chips('Bot1')
 bot3Chips.betamount=1000
 PlayerChips.betamount = 100
 Check_or_call(PlayerHand)
+
+winner= "Player"
+ManageMoney(winner)
