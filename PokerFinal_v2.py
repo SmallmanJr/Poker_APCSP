@@ -295,6 +295,7 @@ BlankHand=Hand(None)
 BlankHand.cards=[card('blank','clubs'),card('blank','clubs')]
 
 
+DealerChips=Chips("Dealer")
 firstThree = False
 current_turn_index = 1  # 0 = Dealer, 1 = Player
 betamountsaved = 1000
@@ -421,11 +422,22 @@ while not rl.window_should_close():
             activePlayers[:] = players[:]
             Start(DealerHand, PlayerHand)
     if Turn == "Dealer":
-        Check_or_call(DealerHand)
+        
         if firstThree == False:
-            HittingCard(RiverHand)
+            Check_or_call(DealerHand)
         else:
+            randnum=random.randint(0,2)
+            if randnum==0:
+                DealerChips.betamount=int(random.randint(0,100))
+            elif randnum==1:
+                Fold(DealerHand)
+            else:
+                Check_or_call(DealerHand)
+        if firstThree==False:
             HittingCard(RiverHand)
+            HittingCard(RiverHand)
+            firstThree=True
+        HittingCard(RiverHand)
     rl.end_drawing()
         
 rl.unload_texture(PokerTableBackground_Texture)
