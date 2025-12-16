@@ -220,64 +220,67 @@ def AdvanceTurn():
 def Check_or_call(Userhand):
     # A function that checks a persons hand if there is no higher bet, call if there is. 
     try:
-        otherBets = []
+        otherBets = [] # List of other peoples bet amount. Appends into. 
         if Userhand.name is not ["River", "Dealer"]:
             global nameUser
-            nameUser = str(Userhand)
+            nameUser = str(Userhand) 
             userChips = PlayerChipConvert.get(nameUser)
             
-        for p in activePlayers:
-            if p.name not in ["Dealer, Player", nameUser]:
+        for p in activePlayers: # For each player
+            if p.name not in ["Dealer, Player", nameUser]: 
 
-                try:
+                try: 
+                    #Get the persons chips from their hand
                     othername = str(p)
                     OtherChips = PlayerChipConvert.get(othername)
                     otherBets.append(OtherChips.betamount)
                 except:
-                    pass
-            elif p in ["Dealer, Player", nameUser]:
+                    print(f"{p.name} has no chips")
+                    
+            elif p in ["Dealer, Player", nameUser]: 
                 print("member in rejected list")
 
                 
-        if otherBets:
+        if otherBets: # if there are other bets 
 
-            highestBet = max(otherBets)
-            if userChips.betamount < highestBet:
+            highestBet = max(otherBets) # get the highest bet that others have
+            if userChips.betamount < highestBet: # if the user's bet is less than the highestbet, then set the usersbet to that amount
                 userChips.betamount = highestBet
-                if userChips.betamount > userChips.total:
+                if userChips.betamount > userChips.total: # if the new bet is greater than the amount of money player has, they go all in 
                     userChips.betamount = userChips.total 
                 print(userChips.betamount, userChips.name, "New Bet")
     except:
         pass
             
-    AdvanceTurn()
+    AdvanceTurn() # Switch turns
     return 
 
 
 def ManageMoney(winner):
     pot = 0 
     for player in players:
-        try: 
+        try: # if the player has chips
             chips = PlayerChipConvert[player]
-            pot += chips.betamount
-            chips.total -= chips.betamount
-            chips.betamount = 0
+            pot += chips.betamount # Add the betamount to the pot
+            chips.total -= chips.betamount # remove the bet from their total
+            chips.betamount = 0 # set bet to zero 
             
-            if player == winner:
+            if player == winner: # FOr the winner, give them the pot
                 chips.total += pot
         except:
             print(f"{player} has no chips")
         
         
   
-def Start(DealerHand, PlayerHand): # Function to start the game. If it isnt already dealt, give both the dealer and the player cards.
+def Start(DealerHand, PlayerHand):
+    # Function to start the game. If it isnt already dealt, give both the dealer and the player cards.
     global Dealt, players
 
 
-    if Dealt:
+    if Dealt: 
         return
 
-    for i in range(2):
+    for i in range(2):# Give the dealer and player two cards to start
         HittingCard(DealerHand)
         HittingCard(PlayerHand)
 
@@ -285,11 +288,12 @@ def Start(DealerHand, PlayerHand): # Function to start the game. If it isnt alre
     Dealt = True
     return Dealt
 
-# ----------------------------- #
+
 # --------- Draw GUI --------- #
-# ----------------------------- # 
+
 deck = Deck(Ranks,Suits)
-deck.shuffle(), deck.shuffle() # Proper double shuffle baby
+for i in range(100): # Shuffles the deck hundred times
+    deck.shuffle() 
 RiverHand = Hand("River")
 DealerHand = Hand("Dealer")
 PlayerHand = Hand("Player")
@@ -298,15 +302,14 @@ PlayerChips = Chips("Player")
 BotChips = Chips("Bot")
 BotChips.betamount = 100
 
-BlankHand=Hand(None)
+# The blank hand is a hand that has only backside of card cards so we can "hide' the persons hand. This is used to hide the dealers hand for example. 
+BlankHand=Hand(None) 
 BlankHand.cards=[card('blank','clubs'),card('blank','clubs')]
 
 
 DealerChips=Chips("Dealer")
-firstThree = False
-current_turn_index = 1  # 0 = Dealer, 1 = Player
-betamountsaved = 1000
-
+firstThree = False # boolean for if we have given down the first 3 middle cards. 
+'''
 def myAiFunction(winner,playerBet):
     
     if winner==1:
@@ -317,31 +320,34 @@ def myAiFunction(winner,playerBet):
         Check_or_call(chips,True)
     else:
         Fold(DealerHand)
+'''
 
-winner=0#just fot shits and giggles
 
 while not rl.window_should_close():
     rl.begin_drawing()
     rl.clear_background(rl.BLACK)
     rl.draw_texture(PokerTableBackground_Texture , 0, 0, rl.WHITE)
     rl.draw_text(f"turn: {Turn}_", 100, 120, 30, rl.BLUE)
-    if Turn == "Player":
-        if rl.is_key_pressed(rl.KEY_B):
+    if Turn == "Player": 
+        if rl.is_key_pressed(rl.KEY_B): # When you push the B button, it allows u to change ur bet
             betting_mode = True
-            #bet_buffer = "" # clears that shit 
+
             
-        if rl.is_key_pressed(rl.KEY_C):
-            if Turn == "Player":
-                Check_or_call(PlayerHand)
+        if rl.is_key_pressed(rl.KEY_C): # When you push the C button, it checks or calls
+            Check_or_call(PlayerHand)
                 
-        if rl.is_key_pressed(rl.KEY_F):
+        if rl.is_key_pressed(rl.KEY_F): # When you push the F button, it folds the players hand
 
             Fold(PlayerHand)
 
         
-    if rl.is_key_pressed(rl.KEY_K):
-        CheckWin(players, RiverHand)
-    if betting_mode:
+
+    if betting_mode: 
+        # After the person pushes B it enables 'betting mode'
+        # When the person types numbers from 0 to 9 on the keyboard it will type it into 'bet buffer' which is the temp bet
+        # When enter is pushed it sets the bet buffer to the actual players bet amount
+        # when backspace is pushed it removes a number in the bet buffer so you can adjust your bet if you mess up typing 
+        
         key = rl.get_key_pressed()
         while key > 0: 
             if key == rl.KEY_ENTER:
@@ -364,59 +370,65 @@ while not rl.window_should_close():
             key = rl.get_key_pressed()
 
     if betting_mode:
+        # During the bet mode, draw text to explain how bet mode works
         rl.draw_text(f"Bet: {bet_buffer}_", 100, 60, 30, rl.BLUE)
         rl.draw_text("Press Enter to finish betting. Type numbers in to bet", 100, 950, 25, rl.BLUE)
     else:
+        # Else, draw the betamount and total 
         rl.draw_text(f"Bet: {PlayerChips.betamount}", 100, 60, 30, rl.BLUE)
         rl.draw_text(f"Total: {PlayerChips.total}", 100, 30, 30, rl.BLUE)
 
 
 
-    if rl.is_key_pressed(rl.KEY_W):
+    if rl.is_key_pressed(rl.KEY_W): # When w is pushed, start the game 
         Start(DealerHand, PlayerHand)
 
 
 
-        
-    if not Dealt:
+    # Draw text to say start game
+    if not Dealt: 
         rl.draw_text("Press W to Start", 620, 700, 30, rl.BLUE)
 
-    Turn=str(Turn)
+    Turn=str(Turn) # In case the turn is not a str set it to a str
 
 
-
-    rl.draw_text("Press B to Hit", 100, 800, 25, rl.BLUE)
+    # Draws the control info on the screen
+    rl.draw_text("Press B to Hit", 100, 800, 25, rl.BLUE) 
     rl.draw_text("Press F to Fold", 100, 850, 25, rl.BLUE)
     rl.draw_text("Press C to Check/call", 100, 900, 25, rl.BLUE)
+    
     if Dealt:
-        deltaTime=time.time()-startTime
+        
+        deltaTime=time.time()-startTime # Delta time so we can sequenctially draw the cards on the screen
 
-        if deltaTime>3:
-            pass
 
-        if deltaTime>3:
+        if deltaTime>3: # Draws the middle cards last
             DrawCards(RiverHand, 468, 426)
-        if deltaTime>2:
-            if RevealDealerCards: 
+        if deltaTime>2: # Draws the dealers cards second
+            if RevealDealerCards:  # if it should reveal the dealers cards, 
                 DrawCards(DealerHand, 710, 255, spacing = -60)
-            else:
+            else: # if not
 
                 DrawCards(BlankHand, 710, 255, spacing = -60)
 
-        if deltaTime>1:
+        if deltaTime>1: # Draw the players cards first
             DrawCards(PlayerHand, 710, 615, spacing = -60 )
             
-        if len(RiverHand.cards) == 5 and Turn == "Dealer":
-            RevealDealerCards = True
+        if len(RiverHand.cards) == 5 and Turn == "Dealer": # If the middle cards are all dealt and it is now the dealers turn (after the player finishes their last move)
+            RevealDealerCards = True # Reveal the dealer cards
 
-            winner = CheckWin(players, RiverHand)
-            ManageMoney(winner)
+            winner = CheckWin(players, RiverHand) # Check the winner
+            ManageMoney(winner) # Remove money from losers and give the winner money
             print(winner)
-            Turn = "Game Over"
-        if Turn == "Game Over":
+            Turn = "Game Over" # Make it so the turn is now gameover so the game stops trying to allow hitting etc
+            
+        if Turn == "Game Over"
+            # Draw the winner and how to restart the game
             rl.draw_text(f"The winner is: {winner}", 660, 550, 50, rl.BLUE)
             rl.draw_text(f"To Play Again Press P", 700, 100, 30, rl.BLUE)
         if rl.is_key_pressed(rl.KEY_P) and Turn == "Game Over":
+            # if the game is over and they push p
+            # Reset the every player's cards, make dealt to false cause it isnt yet dealt, reset the middle cards, etc
             print("Fixing game now")
             for player in players:
                 player.cards = []
@@ -429,7 +441,7 @@ while not rl.window_should_close():
             activePlayers[:] = players[:]
             Start(DealerHand, PlayerHand)
     if Turn == "Dealer":
-        
+
         if firstThree == False:
             Check_or_call(DealerHand)
         else:
